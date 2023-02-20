@@ -47,16 +47,26 @@ buttonAddToCart.addEventListener("click", (event) => {
 
     let storedCart = JSON.parse(localStorage.getItem("cart"));
 
-    if (storedCart === null) {
+    if (storedCart) {
+        const resultFind = storedCart.find(
+            (property) => property.id === idProduct && property.color === colorChosen);
+        if(resultFind) {
+            let updatedQuantity =
+            parseInt(productChosen.quantityChosen) + parseInt(resultFind.quantityChosen);
+            resultFind.quantityChosen = updatedQuantity;
+            localStorage.setItem("cart", JSON.stringify(storedCart));
+        } else {
+            storedCart.push(productChosen);
+            localStorage.setItem("cart", JSON.stringify(storedCart));
+        }
+
+    } else {
         storedCart =[];
         storedCart.push(productChosen);
-        localStorage.setItem("produit", JSON.stringify(storedCart));
-    } else {
-        
+        localStorage.setItem("cart", JSON.stringify(storedCart));
     }
 
-
-})
+});
     
     
 
