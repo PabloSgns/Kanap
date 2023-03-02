@@ -1,13 +1,12 @@
-getProducts();
-
 generateProducts();
 
+// Récupération des données de l'API
 async function getProducts(){
-    const products = await fetch('http://localhost:3000/api/products/');
-    return products.json();
+    const response = await fetch('http://localhost:3000/api/products/');
+    return response.json();
 }
 
-
+// Génération des produits
 function generateProducts() {
     getProducts().then( (products) => {
         for (let i = 0; i < products.length; i++) {
