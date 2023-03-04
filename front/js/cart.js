@@ -1,5 +1,17 @@
 let storedCart = JSON.parse(localStorage.getItem("cart"));
 
+
+async function getProductPrices() {
+    let prices = [];
+    for (let i = 0; i < storedCart.length; i++) {
+      const product = await fetch('http://localhost:3000/api/products/' + storedCart[i].id);
+      const response = await product.json();
+      prices[storedCart[i].id] = response.price;
+    }
+    return prices;
+  }
+
+
 const orderButton = document.getElementById("order");
 const firstNameInput = document.getElementById("firstName");
 const lastNameInput = document.getElementById("lastName");
@@ -13,18 +25,23 @@ const addressError = document.getElementById("addressErrorMsg");
 const cityError = document.getElementById("cityErrorMsg");
 const emailError = document.getElementById("emailErrorMsg");
 
-getCart();
 
-getTotals();
+getProductPrices().then((prices) => {
 
-deleteItem();
+    getCart(prices);
 
-changeQuantity();
+    getTotals(prices);
+
+    deleteItem();
+
+    changeQuantity();
+
+});
 
 validateOrder();
 
 // Génération du panier
-function getCart () {
+function getCart (prices) {
 
     if (storedCart === null || storedCart.length === 0) {
 
@@ -72,7 +89,8 @@ function getCart () {
 
             const productPrice = document.createElement("p");
             productDescription.appendChild(productPrice);
-            productPrice.innerHTML = storedCart[i].price + " €";
+            productPrice.className = "itemPrice";
+            productPrice.innerHTML = prices[storedCart[i].id] + " €";
     
             const productSettings = document.createElement("div");
             productDivContent.appendChild(productSettings);
@@ -108,10 +126,11 @@ function getCart () {
 }
 
 // Récupération du total des quantités et du prix total
-async function getTotals(){
+function getTotals(prices){
 
     // Récupération du total des quantités
     let productQuantity = document.getElementsByClassName('itemQuantity');
+    
     let totalQuantity = 0;
 
     for (let i = 0; i < productQuantity.length; i++) {
@@ -125,9 +144,7 @@ async function getTotals(){
     let totalPrice = 0;
 
     for (let i = 0; i < productQuantity.length; i++) {
-        const product = await fetch("http://localhost:3000/api/products/" + storedCart[i].id)
-        const response = await product.json();
-        totalPrice += (productQuantity[i].valueAsNumber * response.price);
+        totalPrice += (productQuantity[i].valueAsNumber * prices[storedCart[i].id]);
     }
 
     let productTotalPrice = document.getElementById('totalPrice');
@@ -142,6 +159,7 @@ function deleteItem(){
     for (let i = 0; i < productDelete.length; i++) {
 
         productDelete[i].addEventListener("click", (event) => {
+        
 
             if(window.confirm(`Cet article sera supprimé de votre panier, voulez-vous continuer ?`)){
 
