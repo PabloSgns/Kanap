@@ -85,7 +85,7 @@ Pour consulter votre panier, cliquez sur OK`)){
             storedCart =[];
             storedCart.push(productChosen);
             localStorage.setItem("cart", JSON.stringify(storedCart));
-            console.log ("")
+            console.log ("");
         }
     
     Confirmation();
